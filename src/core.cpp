@@ -13,52 +13,89 @@ void setDriverStatus(char axis, int status)
     }
 }
 
-void setDriveMode(int mode)
+void setDriveMode(char axis, int mode)
 {
     if (mode == FULL_STEP)
     {
-        digitalWrite(MS1_X, LOW);
-        digitalWrite(MS2_X, LOW);
-        digitalWrite(MS3_X, LOW);
-        digitalWrite(MS1_Y, LOW);
-        digitalWrite(MS2_Y, LOW);
-        digitalWrite(MS3_Y, LOW);
+        if (axis == 'x')
+        {
+
+            digitalWrite(MS1_X, LOW);
+            digitalWrite(MS2_X, LOW);
+            digitalWrite(MS3_X, LOW);
+        }
+
+        if (axis == 'y')
+        {
+            digitalWrite(MS1_Y, LOW);
+            digitalWrite(MS2_Y, LOW);
+            digitalWrite(MS3_Y, LOW);
+        }
     }
     else if (mode == HALF_STEP)
     {
-        digitalWrite(MS1_X, HIGH);
-        digitalWrite(MS2_X, LOW);
-        digitalWrite(MS3_X, LOW);
-        digitalWrite(MS1_Y, HIGH);
-        digitalWrite(MS2_Y, LOW);
-        digitalWrite(MS3_Y, LOW);
+        if (axis == 'x')
+        {
+            digitalWrite(MS1_X, HIGH);
+            digitalWrite(MS2_X, LOW);
+            digitalWrite(MS3_X, LOW);
+        }
+
+        if (axis == 'y')
+        {
+            digitalWrite(MS1_Y, HIGH);
+            digitalWrite(MS2_Y, LOW);
+            digitalWrite(MS3_Y, LOW);
+        }
     }
     else if (mode == QUARTER_STEP)
     {
-        digitalWrite(MS1_X, LOW);
-        digitalWrite(MS2_X, HIGH);
-        digitalWrite(MS3_X, LOW);
-        digitalWrite(MS1_Y, LOW);
-        digitalWrite(MS2_Y, HIGH);
-        digitalWrite(MS3_Y, LOW);
+        if (axis == 'x')
+        {
+            digitalWrite(MS1_X, LOW);
+            digitalWrite(MS2_X, HIGH);
+            digitalWrite(MS3_X, LOW);
+        }
+
+        if (axis == 'y')
+        {
+            digitalWrite(MS1_Y, LOW);
+            digitalWrite(MS2_Y, HIGH);
+            digitalWrite(MS3_Y, LOW);
+        }
     }
     else if (mode == EIGHTH_STEP)
     {
-        digitalWrite(MS1_X, HIGH);
-        digitalWrite(MS2_X, HIGH);
-        digitalWrite(MS3_X, LOW);
-        digitalWrite(MS1_Y, HIGH);
-        digitalWrite(MS2_Y, HIGH);
-        digitalWrite(MS3_Y, LOW);
+        if (axis == 'x')
+        {
+            digitalWrite(MS1_X, HIGH);
+            digitalWrite(MS2_X, HIGH);
+            digitalWrite(MS3_X, LOW);
+        }
+
+        if (axis == 'y')
+        {
+            digitalWrite(MS1_Y, HIGH);
+            digitalWrite(MS2_Y, HIGH);
+            digitalWrite(MS3_Y, LOW);
+        }
     }
     else if (mode == SIXTEENTH_STEP)
     {
-        digitalWrite(MS1_X, HIGH);
-        digitalWrite(MS2_X, HIGH);
-        digitalWrite(MS3_X, HIGH);
-        digitalWrite(MS1_Y, HIGH);
-        digitalWrite(MS2_Y, HIGH);
-        digitalWrite(MS3_Y, HIGH);
+        if (axis == 'x')
+        {
+            digitalWrite(MS1_X, HIGH);
+            digitalWrite(MS2_X, HIGH);
+            digitalWrite(MS3_X, HIGH);
+        }
+
+        if (axis == 'y')
+        {
+
+            digitalWrite(MS1_Y, HIGH);
+            digitalWrite(MS2_Y, HIGH);
+            digitalWrite(MS3_Y, HIGH);
+        }
     }
 }
 

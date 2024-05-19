@@ -8,18 +8,20 @@
 #include <sstream>
 using namespace std;
 
-const int SELECTED_MODE = HALF_STEP;
+const int SELECTED_MODE = QUARTER_STEP;
 
 int main()
 {
     wiringPiSetup();
     initPins();
     disableOutput();
-    setDriveMode(SELECTED_MODE);
+    setDriveMode('x', SELECTED_MODE);
+    setDriveMode('y', SELECTED_MODE);
     setDriverStatus('x', DRIVER_ENABLE);
     setDriverStatus('y', DRIVER_ENABLE);
 
-    double oneStepDistance = getOneStepDistance(SELECTED_MODE);
+    double oneStepDistanceX = getOneStepDistance(SELECTED_MODE);
+    double oneStepDistanceY = getOneStepDistance(SELECTED_MODE);
     string read;
     string part;
     ifstream ReadFile("test.gcode");
@@ -68,11 +70,11 @@ int main()
 
                 cout << "dirX: " << directionX << "dirY: " << directionY << "tarX: " << targetX << "tarY: " << targetY << endl;
 
-                moveAxis(directionX, targetX, directionY, targetY, oneStepDistance);
+                moveAxis(directionX, targetX, directionY, targetY, oneStepDistanceX, oneStepDistanceY);
 
                 currentX = pointX;
                 currentY = pointY;
-                delay(100); // CHECK HERE
+                // delay(100); // CHECK HERE
             }
 
             printf("End of program :)\n");
@@ -85,15 +87,3 @@ int main()
 
     return 0;
 }
-
-/*
-
-   // if (x >= 0.16)
-        // {
-        //     // drive in full step mode
-        //     // get remaining distance
-        //     // set drive mode sixteenth
-        //     // complete reamining distances
-        // }
-
-*/

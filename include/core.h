@@ -64,7 +64,7 @@ Wiring pi gpio table for determining pin numbers
 void initPins();
 void disableOutput();
 void setDriverStatus(char axis, int status);
-void setDriveMode(int mode);
+void setDriveMode(char axis, int mode);
 int getStepPerRev(int mode);
 double getOneStepDistance(int mode);
 int readSwitch(char axis);
