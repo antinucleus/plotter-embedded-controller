@@ -2,47 +2,98 @@
 #include "../include/core.h"
 #include "../include/step.h"
 #include <wiringPi.h>
+#include <fstream>
+#include <iostream>
+#include <math.h>
+#include <sstream>
+using namespace std;
+
+const int SELECTED_MODE = HALF_STEP;
 
 int main()
 {
     wiringPiSetup();
     initPins();
     disableOutput();
-    setDriveMode(SIXTEENTH_STEP);
+    setDriveMode(SELECTED_MODE);
     setDriverStatus('x', DRIVER_ENABLE);
     setDriverStatus('y', DRIVER_ENABLE);
 
-    double oneStepDistance = getOneStepDistance(SIXTEENTH_STEP);
-    printf("oneStepDistance:: %f\n", oneStepDistance);
+    double oneStepDistance = getOneStepDistance(SELECTED_MODE);
+    string read;
+    string part;
+    ifstream ReadFile("test.gcode");
+    double currentX = 0.0f;
+    double currentY = 0.0f;
+    double pointX = 0.0f;
+    double pointY = 0.0f;
+    double targetX = 0.0f;
+    double targetY = 0.0f;
+    char directionX, directionY;
+    short isStarted = 1;
+
+    // cout << "Auto Homing...\n";
+    // autoHome();
+    // // isStarted = 1;
 
     for (;;)
     {
-        printf("X axis will be move 1 cm to the right after 2 secs\n");
-        delay(2000);
-        moveAxis('x', 'r', oneStepDistance, 10);
-        printf("X axis will be move 1 cm to the left after 2 secs\n");
-        delay(2000);
-        moveAxis('x', 'l', oneStepDistance, 10);
-        setDriverStatus('x', DRIVER_DISABLE);
+        if (isStarted == 1)
+        {
 
-        printf("Waiting for other axis...\n");
-        delay(2000);
+            while (getline(ReadFile, read))
+            {
+                stringstream s(read);
+                cout << "read" << read << endl;
+                printf("currentX: %f  currentY: %f\n", currentX, currentY);
 
-        printf("Y axis will be move 1 cm to the forward after 2 secs\n");
-        delay(2000);
-        moveAxis('y', 'r', oneStepDistance, 10);
-        printf("Y axis will be move 1 cm to the backward after 2 secs\n");
-        delay(2000);
-        moveAxis('y', 'l', oneStepDistance, 10);
-        setDriverStatus('y', DRIVER_DISABLE);
-        delay(2000);
+                while (s >> part)
+                {
+                    cout << "part " << part << endl;
 
-        printf("End of program :)\n");
+                    if (part[0] == 'X')
+                    {
+                        pointX = stod(part.substr(1));
+                        targetX = abs(pointX - currentX);
+                        directionX = pointX < currentX ? '-' : '+';
+                    }
 
-        break;
+                    if (part[0] == 'Y')
+                    {
+                        pointY = stod(part.substr(1));
+                        targetY = abs(pointY - currentY);
+                        directionY = pointY < currentY ? '-' : '+'; // CHECK HERE FOR COORDINATE ROTATION
+                    }
+                }
+
+                cout << "dirX: " << directionX << "dirY: " << directionY << "tarX: " << targetX << "tarY: " << targetY << endl;
+
+                moveAxis(directionX, targetX, directionY, targetY, oneStepDistance);
+
+                currentX = pointX;
+                currentY = pointY;
+                delay(100); // CHECK HERE
+            }
+
+            printf("End of program :)\n");
+            setDriverStatus('x', DRIVER_DISABLE);
+            setDriverStatus('y', DRIVER_DISABLE);
+            isStarted = 0;
+            break;
+        }
     }
-
-    printf("Finished\n");
 
     return 0;
 }
+
+/*
+
+   // if (x >= 0.16)
+        // {
+        //     // drive in full step mode
+        //     // get remaining distance
+        //     // set drive mode sixteenth
+        //     // complete reamining distances
+        // }
+
+*/

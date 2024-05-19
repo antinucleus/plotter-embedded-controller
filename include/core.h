@@ -53,8 +53,10 @@ Wiring pi gpio table for determining pin numbers
 #define MS1_Y 1
 #define MS2_Y 4
 #define MS3_Y 5
+#define LIMIT_SWITCH_X 2
+#define LIMIT_SWITCH_Y 3
 #define STEP_PER_REV 200
-#define DELAY 500 // millis
+#define DELAY 1000 // microseconds
 #define PULLEY_CIRCUMFERENCE 32.0f
 #define ONE_CYCLE 360.0f
 #define DEFAULT_ANGLE 1.8f
@@ -65,5 +67,6 @@ void setDriverStatus(char axis, int status);
 void setDriveMode(int mode);
 int getStepPerRev(int mode);
 double getOneStepDistance(int mode);
+int readSwitch(char axis);
 
 #endif

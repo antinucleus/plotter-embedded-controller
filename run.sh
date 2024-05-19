@@ -1,1 +1,0 @@
-gcc -I./include ./src/main.cpp ./src/core.cpp ./src/step.cpp -o main-code -lwiringPi

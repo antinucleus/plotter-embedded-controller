@@ -1,45 +1,87 @@
 #include "../include/step.h"
 #include "../include/core.h"
 #include <wiringPi.h>
-#include <stdio.h>
+#include <iostream>
 
-// axis: (x-axis = x, y-axis = y)
-// direction: (r = 0, l = 1)
-// oneStepDistance: one step will moveplotter by a distance of 0.16 mm in full-step mode
-// targetDistance: movement distance
-
-void moveAxis(char axis, char direction, double oneStepDistance, double targetDistance)
+void moveAxis(char directionX, double targetDistanceX, char directionY, double targetDistanceY, double oneStepDistance)
 {
-    int stepPin, directionPin;
-    double distance = 0;
 
-    if (axis == 'x')
+    double distanceX = 0, distanceY = 0;
+
+    if (directionX == '+')
     {
-        stepPin = STEP_PIN_X;
-        directionPin = DIRECTION_PIN_X;
+        digitalWrite(DIRECTION_PIN_X, HIGH);
     }
     else
     {
-        stepPin = STEP_PIN_Y;
-        directionPin = DIRECTION_PIN_Y;
+        digitalWrite(DIRECTION_PIN_X, LOW);
     }
-
-    if (direction == 'r')
+    if (directionY == '+')
     {
-        digitalWrite(directionPin, HIGH);
+        digitalWrite(DIRECTION_PIN_Y, LOW);
     }
     else
     {
-        digitalWrite(directionPin, LOW);
+        digitalWrite(DIRECTION_PIN_Y, HIGH);
     }
 
-    while (distance < targetDistance)
+    while (1)
     {
-        digitalWrite(stepPin, HIGH);
-        delayMicroseconds(DELAY);
-        digitalWrite(stepPin, LOW);
-        delayMicroseconds(DELAY);
-        printf("distance: %f\n", distance); /// remove
-        distance += oneStepDistance;
+        if (distanceX < targetDistanceX)
+        {
+            digitalWrite(STEP_PIN_X, HIGH);
+            delayMicroseconds(DELAY);
+            digitalWrite(STEP_PIN_X, LOW);
+            delayMicroseconds(DELAY);
+            distanceX += oneStepDistance;
+        }
+
+        if (distanceY < targetDistanceY)
+        {
+            digitalWrite(STEP_PIN_Y, HIGH);
+            delayMicroseconds(DELAY);
+            digitalWrite(STEP_PIN_Y, LOW);
+            delayMicroseconds(DELAY);
+            distanceY += oneStepDistance;
+        }
+
+        if (distanceX >= targetDistanceX && distanceY >= targetDistanceY)
+        {
+            break;
+        }
+    }
+}
+
+void autoHome()
+{
+    bool isLimitedX,  isLimitedY;
+    int readX,readY;
+    digitalWrite(DIRECTION_PIN_X, LOW);  // -
+    digitalWrite(DIRECTION_PIN_Y, LOW); // +
+
+
+    while (1)
+    {
+        readX = readSwitch('x');
+        readY = readSwitch('y');
+
+        if (readX == LOW)
+        {
+            digitalWrite(STEP_PIN_X, HIGH);
+            delayMicroseconds(DELAY);
+            digitalWrite(STEP_PIN_X, LOW);
+            delayMicroseconds(DELAY);
+        }
+
+        if (readY == LOW)
+        {
+            digitalWrite(STEP_PIN_Y, HIGH);
+            delayMicroseconds(DELAY);
+            digitalWrite(STEP_PIN_Y, LOW);
+            delayMicroseconds(DELAY);
+        }
+
+        if(readX == HIGH && readY == HIGH) { break;}
+
     }
 }

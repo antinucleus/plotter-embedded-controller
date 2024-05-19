@@ -76,6 +76,8 @@ void initPins()
     pinMode(MS1_Y, OUTPUT);
     pinMode(MS2_Y, OUTPUT);
     pinMode(MS3_Y, OUTPUT);
+    pinMode(LIMIT_SWITCH_X, INPUT);
+    pinMode(LIMIT_SWITCH_Y, INPUT);
 }
 
 void disableOutput()
@@ -96,11 +98,26 @@ void disableOutput()
 
 int getStepPerRev(int mode)
 {
-    return ONE_CYCLE / (DEFAULT_ANGLE / (float)mode);
+    return ONE_CYCLE / (DEFAULT_ANGLE / mode);
 }
 
 // returning unit is mm
 double getOneStepDistance(int mode)
 {
     return (PULLEY_CIRCUMFERENCE / ONE_CYCLE) * (DEFAULT_ANGLE / mode);
+}
+
+int readSwitch(char axis)
+{
+    int readValue;
+    if (axis == 'x')
+    {
+        readValue = digitalRead(LIMIT_SWITCH_X);
+    }
+    else
+    {
+        readValue = digitalRead(LIMIT_SWITCH_Y);
+    }
+
+    return readValue;
 }
