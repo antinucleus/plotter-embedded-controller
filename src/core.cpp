@@ -147,6 +147,7 @@ double getOneStepDistance(int mode)
 int readSwitch(char axis)
 {
     int readValue;
+
     if (axis == 'x')
     {
         readValue = digitalRead(LIMIT_SWITCH_X);

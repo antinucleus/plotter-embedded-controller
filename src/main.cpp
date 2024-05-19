@@ -1,24 +1,25 @@
 #include <stdio.h>
+#include "../include/servo.h"
 #include "../include/core.h"
 #include "../include/step.h"
 #include <wiringPi.h>
+#include <softServo.h>
 #include <fstream>
 #include <iostream>
 #include <math.h>
 #include <sstream>
 using namespace std;
 
-const int SELECTED_MODE = QUARTER_STEP;
+const int SELECTED_MODE = SIXTEENTH_STEP;
 
 int main()
 {
     wiringPiSetup();
     initPins();
     disableOutput();
-    setDriveMode('x', SELECTED_MODE);
-    setDriveMode('y', SELECTED_MODE);
     setDriverStatus('x', DRIVER_ENABLE);
     setDriverStatus('y', DRIVER_ENABLE);
+    softServoSetup(23, 23, 23, 23, 23, 23, 23, 23);
 
     double oneStepDistanceX = getOneStepDistance(SELECTED_MODE);
     double oneStepDistanceY = getOneStepDistance(SELECTED_MODE);
@@ -32,11 +33,14 @@ int main()
     double targetX = 0.0f;
     double targetY = 0.0f;
     char directionX, directionY;
-    short isStarted = 1;
+    short isStarted = 0;
 
-    // cout << "Auto Homing...\n";
-    // autoHome();
-    // // isStarted = 1;
+    cout << "Auto Homing...\n";
+    moveTool('+');
+    autoHome();
+    setDriveMode('x', SELECTED_MODE);
+    setDriveMode('y', SELECTED_MODE);
+    isStarted = 1;
 
     for (;;)
     {
@@ -46,12 +50,19 @@ int main()
             while (getline(ReadFile, read))
             {
                 stringstream s(read);
-                cout << "read" << read << endl;
-                printf("currentX: %f  currentY: %f\n", currentX, currentY);
+                // printf("currentX: %f  currentY: %f\n", currentX, currentY);
 
                 while (s >> part)
                 {
-                    cout << "part " << part << endl;
+                    if (part == "G0")
+                    {
+                        moveTool('+');
+                    }
+
+                    if (part == "G1")
+                    {
+                        moveTool('-');
+                    }
 
                     if (part[0] == 'X')
                     {
@@ -64,7 +75,7 @@ int main()
                     {
                         pointY = stod(part.substr(1));
                         targetY = abs(pointY - currentY);
-                        directionY = pointY < currentY ? '-' : '+'; // CHECK HERE FOR COORDINATE ROTATION
+                        directionY = pointY < currentY ? '+' : '-'; // CHECK HERE FOR COORDINATE ROTATION
                     }
                 }
 
@@ -74,10 +85,11 @@ int main()
 
                 currentX = pointX;
                 currentY = pointY;
-                // delay(100); // CHECK HERE
             }
 
             printf("End of program :)\n");
+            moveTool('+');
+            serveBed();
             setDriverStatus('x', DRIVER_DISABLE);
             setDriverStatus('y', DRIVER_DISABLE);
             isStarted = 0;

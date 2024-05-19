@@ -7,5 +7,6 @@
 
 void moveAxis(char directionX, double targetDistanceX, char directionY, double targetDistanceY, double oneStepDistanceX, double oneStepDistanceY);
 void autoHome();
+void serveBed();
 
 #endif
