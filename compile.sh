@@ -1,1 +1,1 @@
-g++ -I./include ./src/main.cpp ./src/core.cpp ./src/api.cpp ./src/step.cpp ./src/servo.cpp ~/Desktop/PlotterController/embedded/wiringPi/softServo.c -o run -lwiringPi -l curl
+g++ -I./include ./src/* ~/Desktop/PlotterController/embedded/wiringPi/softServo.c -o run -lwiringPi -lcurl

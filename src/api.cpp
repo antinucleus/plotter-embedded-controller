@@ -2,7 +2,7 @@
 #include <curl/curl.h>
 using namespace std;
 
-const string BASE_URL = "http://192.168.159.107:3000";
+const string BASE_URL = "localhost:3000";
 
 static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
