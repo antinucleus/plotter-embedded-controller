@@ -10,9 +10,10 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
     return size * nmemb;
 }
 
-string getData()
+string getData(string path)
 {
-    string url = BASE_URL.c_str();
+    string url = BASE_URL;
+    url.append(path);
     CURL *curl;
     CURLcode res;
     string readBuffer;
@@ -21,7 +22,7 @@ string getData()
 
     if (curl)
     {
-        curl_easy_setopt(curl, CURLOPT_URL, url);
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
         res = curl_easy_perform(curl);
@@ -36,16 +37,13 @@ string getData()
     return readBuffer;
 }
 
-string postData(double x, double y)
+string postData(string path, string body)
 {
     string url = BASE_URL;
-    url.append("/data");
-    string body = "";
-    body.append("x=").append(to_string(x)).append("&y=").append(to_string(y));
-    string readBuffer;
-
+    url.append(path);
     CURL *curl;
     CURLcode res;
+    string readBuffer;
 
     curl = curl_easy_init();
 
@@ -66,4 +64,29 @@ string postData(double x, double y)
     }
 
     return readBuffer;
+}
+
+void sendCoordinates(double x, double y)
+{
+    string path = "/machine/coordinates";
+    string body = "";
+    body.append("x=").append(to_string(x)).append("&y=").append(to_string(y));
+
+    string response = postData(path, body);
+
+    printf("Response from send coordinates:%s\n", response.c_str());
+}
+
+void movePen(string direction)
+{
+    string path = "/machine/pen";
+
+    string body = "";
+    body.append("penDirection=").append(direction);
+
+    printf("BODY TO SEND: %s\n", body.c_str());
+
+    string response = postData(path, body);
+
+    printf("Response from move pen:%s\n", response.c_str());
 }
