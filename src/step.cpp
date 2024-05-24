@@ -1,14 +1,15 @@
 #include "../include/step.h"
 #include "../include/core.h"
+#include "../include/servo.h"
 #include <wiringPi.h>
 #include <iostream>
 
-void moveAxis(char directionX, double targetDistanceX, char directionY, double targetDistanceY, double oneStepDistanceX, double oneStepDistanceY)
+void moveAxis(std::string directionX, double targetDistanceX, std::string directionY, double targetDistanceY, double oneStepDistanceX, double oneStepDistanceY)
 {
 
     double distanceX = 0.0, distanceY = 0.0;
 
-    if (directionX == '+')
+    if (directionX == "+")
     {
         digitalWrite(DIRECTION_PIN_X, HIGH);
     }
@@ -16,18 +17,18 @@ void moveAxis(char directionX, double targetDistanceX, char directionY, double t
     {
         digitalWrite(DIRECTION_PIN_X, LOW);
     }
-    if (directionY == '+')
+    if (directionY == "+")
     {
-        digitalWrite(DIRECTION_PIN_Y, LOW);
+        digitalWrite(DIRECTION_PIN_Y, HIGH);
     }
     else
     {
-        digitalWrite(DIRECTION_PIN_Y, HIGH);
+        digitalWrite(DIRECTION_PIN_Y, LOW);
     }
 
     while (1)
     {
-        if (distanceX <= targetDistanceX)
+        if (distanceX < targetDistanceX)
         {
             digitalWrite(STEP_PIN_X, HIGH);
             delayMicroseconds(DELAY);
@@ -36,7 +37,7 @@ void moveAxis(char directionX, double targetDistanceX, char directionY, double t
             distanceX += oneStepDistanceX;
         }
 
-        if (distanceY <= targetDistanceY)
+        if (distanceY < targetDistanceY)
         {
             digitalWrite(STEP_PIN_Y, HIGH);
             delayMicroseconds(DELAY);
@@ -45,7 +46,7 @@ void moveAxis(char directionX, double targetDistanceX, char directionY, double t
             distanceY += oneStepDistanceY;
         }
 
-        if (distanceX > targetDistanceX && distanceY > targetDistanceY)
+        if (distanceX >= targetDistanceX && distanceY >= targetDistanceY)
         {
             std::cout << "targetDistanceX: " << targetDistanceX << "distanceX" << distanceX << std::endl;
             std::cout << "targetDistanceY: " << targetDistanceY << "distanceY" << distanceY << std::endl;
@@ -58,10 +59,11 @@ void autoHome()
 {
     bool isLimitedX, isLimitedY;
     int readX, readY;
-    setDriveMode('x',HALF_STEP);
-    setDriveMode('y',HALF_STEP);
+    setDriveMode('x', HALF_STEP);
+    setDriveMode('y', HALF_STEP);
     digitalWrite(DIRECTION_PIN_X, LOW); // -
     digitalWrite(DIRECTION_PIN_Y, LOW); // +
+    moveTool('+');
 
     while (1)
     {
@@ -89,17 +91,20 @@ void autoHome()
             break;
         }
     }
+
+    moveTool('-');
 }
 
 void serveBed()
 {
     bool isLimitedX, isLimitedY;
     int readX, readY;
-    
-    setDriveMode('x',HALF_STEP);
-    setDriveMode('y',HALF_STEP);
+
+    setDriveMode('x', HALF_STEP);
+    setDriveMode('y', HALF_STEP);
     digitalWrite(DIRECTION_PIN_X, LOW);  // -
     digitalWrite(DIRECTION_PIN_Y, HIGH); // -
+    moveTool('+');
 
     while (1)
     {
@@ -122,9 +127,11 @@ void serveBed()
         //     delayMicroseconds(DELAY);
         // }
 
-        if (readX == HIGH ) // && readY == HIGH
+        if (readX == HIGH) // && readY == HIGH
         {
             break;
         }
     }
+
+    moveTool('-');
 }
