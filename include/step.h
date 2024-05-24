@@ -6,7 +6,9 @@
 // targetDistanceX, targetDistanceY: desired distances in mm
 // oneStepDistance: one step will move plotter by a distance of 0.16 mm in full-step mode
 
+void pulseStepMotor(char axis);
 void moveAxis(std::string directionX, double targetDistanceX, std::string directionY, double targetDistanceY, double oneStepDistanceX, double oneStepDistanceY);
+void stayMinimumDistanceFromSwitch();
 void autoHome();
 void serveBed();
 

@@ -4,10 +4,29 @@
 #include <wiringPi.h>
 #include <iostream>
 
+void pulseStepMotor(char axis)
+{
+    if (axis == 'x')
+    {
+        digitalWrite(STEP_PIN_X, HIGH);
+        delayMicroseconds(DELAY);
+        digitalWrite(STEP_PIN_X, LOW);
+        delayMicroseconds(DELAY);
+    }
+    else
+    {
+        digitalWrite(STEP_PIN_Y, HIGH);
+        delayMicroseconds(DELAY);
+        digitalWrite(STEP_PIN_Y, LOW);
+        delayMicroseconds(DELAY);
+    }
+}
+
 void moveAxis(std::string directionX, double targetDistanceX, std::string directionY, double targetDistanceY, double oneStepDistanceX, double oneStepDistanceY)
 {
 
-    double distanceX = 0.0, distanceY = 0.0;
+    int readX, readY;
+    double distanceX = 0.0f, distanceY = 0.0f;
 
     if (directionX == "+")
     {
@@ -17,6 +36,7 @@ void moveAxis(std::string directionX, double targetDistanceX, std::string direct
     {
         digitalWrite(DIRECTION_PIN_X, LOW);
     }
+
     if (directionY == "+")
     {
         digitalWrite(DIRECTION_PIN_Y, HIGH);
@@ -28,28 +48,51 @@ void moveAxis(std::string directionX, double targetDistanceX, std::string direct
 
     while (1)
     {
+        readX = readSwitch('x');
+        readY = readSwitch('y');
+
         if (distanceX < targetDistanceX)
         {
-            digitalWrite(STEP_PIN_X, HIGH);
-            delayMicroseconds(DELAY);
-            digitalWrite(STEP_PIN_X, LOW);
-            delayMicroseconds(DELAY);
+            pulseStepMotor('x');
             distanceX += oneStepDistanceX;
         }
 
         if (distanceY < targetDistanceY)
         {
-            digitalWrite(STEP_PIN_Y, HIGH);
-            delayMicroseconds(DELAY);
-            digitalWrite(STEP_PIN_Y, LOW);
-            delayMicroseconds(DELAY);
+            pulseStepMotor('y');
             distanceY += oneStepDistanceY;
         }
 
         if (distanceX >= targetDistanceX && distanceY >= targetDistanceY)
         {
-            std::cout << "targetDistanceX: " << targetDistanceX << "distanceX" << distanceX << std::endl;
-            std::cout << "targetDistanceY: " << targetDistanceY << "distanceY" << distanceY << std::endl;
+            break;
+        }
+    }
+}
+
+void stayMinimumDistanceFromSwitch()
+{
+    digitalWrite(DIRECTION_PIN_X, HIGH); // +
+    digitalWrite(DIRECTION_PIN_Y, HIGH); // +
+    int readX, readY;
+
+    while (1)
+    {
+        readX = readSwitch('x');
+        readY = readSwitch('y');
+
+        if (readX == HIGH)
+        {
+            pulseStepMotor('x');
+        }
+
+        if (readY == HIGH)
+        {
+            pulseStepMotor('y');
+        }
+
+        if (readX == LOW && readY == LOW)
+        {
             break;
         }
     }
@@ -57,12 +100,13 @@ void moveAxis(std::string directionX, double targetDistanceX, std::string direct
 
 void autoHome()
 {
-    bool isLimitedX, isLimitedY;
     int readX, readY;
-    setDriveMode('x', HALF_STEP);
-    setDriveMode('y', HALF_STEP);
+    setDriveMode('x', QUARTER_STEP);
+    setDriveMode('y', QUARTER_STEP);
+    setDriverStatus('x', DRIVER_ENABLE);
+    setDriverStatus('y', DRIVER_ENABLE);
     digitalWrite(DIRECTION_PIN_X, LOW); // -
-    digitalWrite(DIRECTION_PIN_Y, LOW); // +
+    digitalWrite(DIRECTION_PIN_Y, LOW); // -
     moveTool('+');
 
     while (1)
@@ -72,36 +116,34 @@ void autoHome()
 
         if (readX == LOW)
         {
-            digitalWrite(STEP_PIN_X, HIGH);
-            delayMicroseconds(DELAY);
-            digitalWrite(STEP_PIN_X, LOW);
-            delayMicroseconds(DELAY);
+            pulseStepMotor('x');
         }
 
         if (readY == LOW)
         {
-            digitalWrite(STEP_PIN_Y, HIGH);
-            delayMicroseconds(DELAY);
-            digitalWrite(STEP_PIN_Y, LOW);
-            delayMicroseconds(DELAY);
+            pulseStepMotor('y');
         }
 
         if (readX == HIGH && readY == HIGH)
         {
+            stayMinimumDistanceFromSwitch();
             break;
         }
     }
 
+    setDriverStatus('x', DRIVER_DISABLE);
+    setDriverStatus('y', DRIVER_DISABLE);
     moveTool('-');
 }
 
 void serveBed()
 {
-    bool isLimitedX, isLimitedY;
     int readX, readY;
 
-    setDriveMode('x', HALF_STEP);
-    setDriveMode('y', HALF_STEP);
+    setDriveMode('x', QUARTER_STEP);
+    setDriveMode('y', QUARTER_STEP);
+    setDriverStatus('x', DRIVER_ENABLE);
+    setDriverStatus('y', DRIVER_ENABLE);
     digitalWrite(DIRECTION_PIN_X, LOW);  // -
     digitalWrite(DIRECTION_PIN_Y, HIGH); // -
     moveTool('+');
@@ -113,18 +155,12 @@ void serveBed()
 
         if (readX == LOW)
         {
-            digitalWrite(STEP_PIN_X, HIGH);
-            delayMicroseconds(DELAY);
-            digitalWrite(STEP_PIN_X, LOW);
-            delayMicroseconds(DELAY);
+            pulseStepMotor('x');
         }
 
         // if (readY == LOW)
         // {
-        //     digitalWrite(STEP_PIN_Y, HIGH);
-        //     delayMicroseconds(DELAY);
-        //     digitalWrite(STEP_PIN_Y, LOW);
-        //     delayMicroseconds(DELAY);
+        //     pulseStepMotor('y');
         // }
 
         if (readX == HIGH) // && readY == HIGH
@@ -133,5 +169,7 @@ void serveBed()
         }
     }
 
+    setDriverStatus('x', DRIVER_DISABLE);
+    setDriverStatus('y', DRIVER_DISABLE);
     moveTool('-');
 }

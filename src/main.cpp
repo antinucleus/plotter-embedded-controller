@@ -32,7 +32,7 @@ int main()
     double oneStepDistanceY = getOneStepDistance(SELECTED_MODE);
     string read;
     string part;
-    ifstream ReadFile("test.gcode");
+    ifstream ReadFile;
     double currentX = 0.0f;
     double currentY = 0.0f;
     double pointX = 0.0f;
@@ -41,7 +41,7 @@ int main()
     double targetY = 0.0f;
     string directionX, directionY;
     short isStarted = 0;
-    int fetchInterval = 1000; // millis
+    int fetchInterval = 300; // millis
     string response;
     unsigned int timer = millis();
 
@@ -75,7 +75,10 @@ int main()
                 {
                     cout << "-----AUTO HOME STARTED----" << endl;
                     autoHome();
+                    currentX = 0.0;
+                    currentY = 0.0;
                     cout << "-----AUTO HOME FINISHED----" << endl;
+                    sendCoordinates(currentX, currentY);
                     updateAutoHomeStatus("no");
                 }
 
@@ -84,29 +87,25 @@ int main()
                     isStarted = 1;
                 }
 
-                if (isMovingPen == "yes")
+                if (penPosition == "up")
                 {
-                    if (penPosition == "up")
-                    {
-                        moveTool('+');
-                    }
-                    else if (penPosition == "down")
-                    {
-                        moveTool('-');
-                    }
-
-                    updateMovingPenStatus("no");
+                    moveTool('+');
                 }
+                else if (penPosition == "down")
+                {
+                    moveTool('-');
+                }
+
+                updateMovingPenStatus("no");
 
                 if (isMovingX == "yes")
                 {
                     setDriverStatus('x', DRIVER_ENABLE);
-                    setDriverStatus('y', DRIVER_ENABLE);
-
                     setDriveModeManualControl('x', driveMode.GetString());
 
                     oneStepDistanceX = getOneStepDistanceManualControl(driveMode.GetString());
                     moveAxis(direction.GetString(), targetDistanceX.GetDouble(), "-", 0, oneStepDistanceX, 0);
+
                     if (direction == "+")
                     {
                         currentX += targetDistanceX.GetDouble();
@@ -117,18 +116,13 @@ int main()
                     }
 
                     sendCoordinates(currentX, currentY);
-
                     updateMovingAxisStatus('x', "no");
-
                     setDriverStatus('x', DRIVER_DISABLE);
-                    setDriverStatus('y', DRIVER_DISABLE);
                 }
 
                 if (isMovingY == "yes")
                 {
-                    setDriverStatus('x', DRIVER_ENABLE);
                     setDriverStatus('y', DRIVER_ENABLE);
-
                     setDriveModeManualControl('y', driveMode.GetString());
 
                     oneStepDistanceY = getOneStepDistanceManualControl(driveMode.GetString());
@@ -144,10 +138,7 @@ int main()
                     }
 
                     sendCoordinates(currentX, currentY);
-
                     updateMovingAxisStatus('y', "no");
-
-                    setDriverStatus('x', DRIVER_DISABLE);
                     setDriverStatus('y', DRIVER_DISABLE);
                 }
             }
@@ -161,15 +152,16 @@ int main()
 
         if (isStarted == 1)
         {
-            setDriverStatus('x', DRIVER_ENABLE);
-            setDriverStatus('y', DRIVER_ENABLE);
-            oneStepDistanceX = getOneStepDistance(SELECTED_MODE);
-            oneStepDistanceY = getOneStepDistance(SELECTED_MODE);
+            autoHome();
             setDriveMode('x', SELECTED_MODE);
             setDriveMode('y', SELECTED_MODE);
-            autoHome();
-            currentX = 0.0;
-            currentY = 0.0;
+            oneStepDistanceX = getOneStepDistance(SELECTED_MODE);
+            oneStepDistanceY = getOneStepDistance(SELECTED_MODE);
+            setDriverStatus('x', DRIVER_ENABLE);
+            setDriverStatus('y', DRIVER_ENABLE);
+            currentX = 0.0f;
+            currentY = 0.0f;
+            ReadFile.open("test.gcode");
 
             while (getline(ReadFile, read))
             {
@@ -213,9 +205,8 @@ int main()
 
             printf("End of program :)\n");
             serveBed();
-            setDriverStatus('x', DRIVER_DISABLE);
-            setDriverStatus('y', DRIVER_DISABLE);
             updateStartPlottingStatus("no");
+            ReadFile.close();
             isStarted = 0;
         }
     }

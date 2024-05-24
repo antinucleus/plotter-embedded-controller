@@ -72,9 +72,7 @@ void sendCoordinates(double x, double y)
     string body = "";
     body.append("x=").append(to_string(x)).append("&y=").append(to_string(y));
 
-    string response = postData(path, body);
-
-    printf("Response from send coordinates:%s\n", response.c_str());
+    postData(path, body);
 }
 
 void movePen(string direction)
@@ -84,11 +82,7 @@ void movePen(string direction)
     string body = "";
     body.append("penPosition=").append(direction);
 
-    printf("BODY TO SEND: %s\n", body.c_str());
-
-    string response = postData(path, body);
-
-    printf("Response from move pen:%s\n", response.c_str());
+    postData(path, body);
 }
 
 void updateAutoHomeStatus(string autoHomeStatus)
@@ -97,11 +91,7 @@ void updateAutoHomeStatus(string autoHomeStatus)
     string body = "";
     body.append("autoHoming=").append(autoHomeStatus);
 
-    printf("BODY TO SEND: %s\n", body.c_str());
-
-    string response = postData(path, body);
-
-    printf("Response from updateAutoHomeStatus:%s\n", response.c_str());
+    postData(path, body);
 }
 
 void updateMovingAxisStatus(char axis, string movingStatus)
@@ -119,11 +109,7 @@ void updateMovingAxisStatus(char axis, string movingStatus)
 
     body.append(movingStatus);
 
-    printf("BODY TO SEND: %s\n", body.c_str());
-
-    string response = postData(path, body);
-
-    printf("Response from updateMovingStatus:%s\n", response.c_str());
+    postData(path, body);
 }
 
 void updateStartPlottingStatus(string startPlottingStatus)
@@ -132,11 +118,7 @@ void updateStartPlottingStatus(string startPlottingStatus)
     string body = "";
     body.append("startPlotting=").append(startPlottingStatus);
 
-    printf("BODY TO SEND: %s\n", body.c_str());
-
-    string response = postData(path, body);
-
-    printf("Response from updateStartPlottingStatus:%s\n", response.c_str());
+    postData(path, body);
 }
 
 void updateMovingPenStatus(string movingStatus)
@@ -145,9 +127,5 @@ void updateMovingPenStatus(string movingStatus)
     string body = "";
     body.append("isMovingPen=").append(movingStatus);
 
-    printf("BODY TO SEND: %s\n", body.c_str());
-
-    string response = postData(path, body);
-
-    printf("Response from updateStartPlottingStatus:%s\n", response.c_str());
+    postData(path, body);
 }
