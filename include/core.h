@@ -56,6 +56,7 @@ Wiring pi gpio table for determining pin numbers
 #define LIMIT_SWITCH_X 2
 #define LIMIT_SWITCH_Y 3
 #define STEP_PER_REV 200
+#define SERVO_PIN 23
 #define DELAY 1000 // microseconds
 #define PULLEY_CIRCUMFERENCE 32.0f
 #define ONE_CYCLE 360.0f

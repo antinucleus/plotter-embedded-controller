@@ -9,7 +9,7 @@
 void pulseStepMotor(char axis);
 void moveAxis(std::string directionX, double targetDistanceX, std::string directionY, double targetDistanceY, double oneStepDistanceX, double oneStepDistanceY);
 void stayMinimumDistanceFromSwitch();
-void autoHome();
+void autoHome(double *currentX, double *currentY);
 void serveBed();
 
 #endif

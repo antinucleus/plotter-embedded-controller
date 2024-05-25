@@ -98,7 +98,7 @@ void stayMinimumDistanceFromSwitch()
     }
 }
 
-void autoHome()
+void autoHome(double *currentX, double *currentY)
 {
     int readX, readY;
     setDriveMode('x', QUARTER_STEP);
@@ -131,8 +131,9 @@ void autoHome()
         }
     }
 
-    setDriverStatus('x', DRIVER_DISABLE);
-    setDriverStatus('y', DRIVER_DISABLE);
+    *currentX = 0.0;
+    *currentY = 0.0;
+
     moveTool('-');
 }
 
@@ -169,7 +170,5 @@ void serveBed()
         }
     }
 
-    setDriverStatus('x', DRIVER_DISABLE);
-    setDriverStatus('y', DRIVER_DISABLE);
     moveTool('-');
 }

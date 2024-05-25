@@ -1,5 +1,6 @@
-#include "../include/core.h"
 #include <wiringPi.h>
+#include <softServo.h>
+#include "../include/core.h"
 
 void setDriverStatus(char axis, int status)
 {
@@ -115,6 +116,7 @@ void initPins()
     pinMode(MS3_Y, OUTPUT);
     pinMode(LIMIT_SWITCH_X, INPUT);
     pinMode(LIMIT_SWITCH_Y, INPUT);
+    softServoSetup(SERVO_PIN, SERVO_PIN, SERVO_PIN, SERVO_PIN, SERVO_PIN, SERVO_PIN, SERVO_PIN, SERVO_PIN);
 }
 
 void disableOutput()

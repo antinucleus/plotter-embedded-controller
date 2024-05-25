@@ -10,14 +10,10 @@
 #include <iostream>
 #include <math.h>
 #include <sstream>
-#include <curl/curl.h>
-#include "../include/rapidjson/document.h"
-#include "../include/rapidjson/writer.h"
-#include "../include/rapidjson/stringbuffer.h"
 using namespace std;
-using namespace rapidjson;
 
 const int SELECTED_MODE = SIXTEENTH_STEP;
+const int FETCH_INTERVAL = 300; // ms
 
 int main()
 {
@@ -26,121 +22,35 @@ int main()
     disableOutput();
     setDriverStatus('x', DRIVER_ENABLE);
     setDriverStatus('y', DRIVER_ENABLE);
-    softServoSetup(23, 23, 23, 23, 23, 23, 23, 23);
 
+    ifstream ReadFile;
     double oneStepDistanceX = getOneStepDistance(SELECTED_MODE);
     double oneStepDistanceY = getOneStepDistance(SELECTED_MODE);
-    string read;
-    string part;
-    ifstream ReadFile;
     double currentX = 0.0f;
     double currentY = 0.0f;
     double pointX = 0.0f;
     double pointY = 0.0f;
     double targetX = 0.0f;
     double targetY = 0.0f;
-    string directionX, directionY;
     short isStarted = 0;
-    int fetchInterval = 300; // millis
+    string read;
+    string part;
+    string directionX, directionY;
     string response;
+    string url = "/machine/status";
+
     unsigned int timer = millis();
 
     for (;;)
     {
 
-        if (millis() - timer > fetchInterval)
+        if (millis() - timer > FETCH_INTERVAL)
         {
-            response = getData("/machine/status");
+            response = getData(url);
 
             if (response != "")
             {
-                printf("incoming data:%s\n", response.c_str());
-
-                Document d;
-                d.Parse(response.c_str());
-
-                Value &autoHoming = d["autoHoming"];
-                Value &startPlotting = d["startPlotting"];
-                Value &manualControl = d["manualControl"];
-                Value &penPosition = d["penPosition"];
-                Value &isMovingPen = d["isMovingPen"];
-                Value &isMovingX = d["isMovingX"];
-                Value &isMovingY = d["isMovingY"];
-                Value &targetDistanceX = d["targetDistanceX"];
-                Value &targetDistanceY = d["targetDistanceY"];
-                Value &direction = d["direction"];
-                Value &driveMode = d["driveMode"];
-
-                if (autoHoming == "yes")
-                {
-                    cout << "-----AUTO HOME STARTED----" << endl;
-                    autoHome();
-                    currentX = 0.0;
-                    currentY = 0.0;
-                    cout << "-----AUTO HOME FINISHED----" << endl;
-                    sendCoordinates(currentX, currentY);
-                    updateAutoHomeStatus("no");
-                }
-
-                if (startPlotting == "yes")
-                {
-                    isStarted = 1;
-                }
-
-                if (penPosition == "up")
-                {
-                    moveTool('+');
-                }
-                else if (penPosition == "down")
-                {
-                    moveTool('-');
-                }
-
-                updateMovingPenStatus("no");
-
-                if (isMovingX == "yes")
-                {
-                    setDriverStatus('x', DRIVER_ENABLE);
-                    setDriveModeManualControl('x', driveMode.GetString());
-
-                    oneStepDistanceX = getOneStepDistanceManualControl(driveMode.GetString());
-                    moveAxis(direction.GetString(), targetDistanceX.GetDouble(), "-", 0, oneStepDistanceX, 0);
-
-                    if (direction == "+")
-                    {
-                        currentX += targetDistanceX.GetDouble();
-                    }
-                    else
-                    {
-                        currentX -= targetDistanceX.GetDouble();
-                    }
-
-                    sendCoordinates(currentX, currentY);
-                    updateMovingAxisStatus('x', "no");
-                    setDriverStatus('x', DRIVER_DISABLE);
-                }
-
-                if (isMovingY == "yes")
-                {
-                    setDriverStatus('y', DRIVER_ENABLE);
-                    setDriveModeManualControl('y', driveMode.GetString());
-
-                    oneStepDistanceY = getOneStepDistanceManualControl(driveMode.GetString());
-                    moveAxis("-", 0, direction.GetString(), targetDistanceY.GetDouble(), 0, oneStepDistanceY);
-
-                    if (direction == "+")
-                    {
-                        currentY += targetDistanceY.GetDouble();
-                    }
-                    else
-                    {
-                        currentY -= targetDistanceY.GetDouble();
-                    }
-
-                    sendCoordinates(currentX, currentY);
-                    updateMovingAxisStatus('y', "no");
-                    setDriverStatus('y', DRIVER_DISABLE);
-                }
+                manualMode(response, &currentX, &currentY, &isStarted);
             }
             else
             {
@@ -152,15 +62,14 @@ int main()
 
         if (isStarted == 1)
         {
-            autoHome();
+            autoHome(&currentX, &currentY);
             setDriveMode('x', SELECTED_MODE);
             setDriveMode('y', SELECTED_MODE);
             oneStepDistanceX = getOneStepDistance(SELECTED_MODE);
             oneStepDistanceY = getOneStepDistance(SELECTED_MODE);
             setDriverStatus('x', DRIVER_ENABLE);
             setDriverStatus('y', DRIVER_ENABLE);
-            currentX = 0.0f;
-            currentY = 0.0f;
+
             ReadFile.open("test.gcode");
 
             while (getline(ReadFile, read))
@@ -194,7 +103,7 @@ int main()
                     }
                 }
 
-                cout << "dirX: " << directionX << "dirY: " << directionY << "tarX: " << targetX << "tarY: " << targetY << endl;
+                cout << "dirX: " << directionX << "\tdirY: " << directionY << "\ttarX: " << targetX << "\ttarY: " << targetY << endl;
 
                 moveAxis(directionX, targetX, directionY, targetY, oneStepDistanceX, oneStepDistanceY);
 
