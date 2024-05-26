@@ -125,6 +125,7 @@ int main()
             updateStartPlottingStatus("no");
             ReadFile.close();
             isStarted = 0;
+            isStopped = 0;
         }
     }
 
