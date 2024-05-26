@@ -33,6 +33,7 @@ int main()
     double targetX = 0.0f;
     double targetY = 0.0f;
     short isStarted = 0;
+    short isStopped = 0;
     string read;
     string part;
     string directionX, directionY;
@@ -70,7 +71,7 @@ int main()
             setDriverStatus('x', DRIVER_ENABLE);
             setDriverStatus('y', DRIVER_ENABLE);
 
-            ReadFile.open("test.gcode");
+            ReadFile.open("output.gcode");
 
             while (getline(ReadFile, read))
             {
@@ -110,6 +111,13 @@ int main()
                 currentX = pointX;
                 currentY = pointY;
                 sendCoordinates(currentX, currentY);
+                isStopped = checkStopPlotting(&isStarted);
+
+                if (isStopped == 1)
+                {
+                    printf("Program aborted\n");
+                    break;
+                }
             }
 
             printf("End of program :)\n");

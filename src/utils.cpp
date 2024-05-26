@@ -138,3 +138,24 @@ void manualMode(string response, double *currentX, double *currentY, short *isSt
         updateMovingAxisStatus('y', "no");
     }
 }
+
+short checkStopPlotting(short *isStarted)
+{
+    string url = "/machine/status";
+    string response = getData(url);
+
+    Document d;
+    d.Parse(response.c_str());
+
+    Value &startPlotting = d["startPlotting"];
+
+    if (startPlotting == "no")
+    {
+        *isStarted = 0;
+        updateStartPlottingStatus("no");
+
+        return 1;
+    }
+
+    return 0;
+}
