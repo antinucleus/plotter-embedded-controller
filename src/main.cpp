@@ -39,6 +39,7 @@ int main()
     string directionX, directionY;
     string response;
     string url = "/machine/status";
+    string fileDir = "../plotter-express-server/output.gcode";
 
     unsigned int timer = millis();
 
@@ -71,7 +72,7 @@ int main()
             setDriverStatus('x', DRIVER_ENABLE);
             setDriverStatus('y', DRIVER_ENABLE);
 
-            ReadFile.open("output.gcode");
+            ReadFile.open(fileDir);
 
             while (getline(ReadFile, read))
             {
