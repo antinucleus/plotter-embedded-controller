@@ -135,6 +135,8 @@ void autoHome(double *currentX, double *currentY)
     *currentY = 0.0;
 
     moveTool('-');
+    setDriverStatus('x', DRIVER_DISABLE);
+    setDriverStatus('y', DRIVER_DISABLE);
 }
 
 void serveBed()
@@ -171,4 +173,6 @@ void serveBed()
     }
 
     moveTool('-');
+    setDriverStatus('x', DRIVER_DISABLE);
+    setDriverStatus('y', DRIVER_DISABLE);
 }

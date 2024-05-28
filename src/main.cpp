@@ -12,7 +12,7 @@
 #include <sstream>
 using namespace std;
 
-const int SELECTED_MODE = SIXTEENTH_STEP;
+const int SELECTED_MODE = QUARTER_STEP;
 const int FETCH_INTERVAL = 300; // ms
 
 int main()
@@ -39,7 +39,7 @@ int main()
     string directionX, directionY;
     string response;
     string url = "/machine/status";
-    string fileDir = "../plotter-express-server/output.gcode";
+    string fileDir = "/home/oxygen/Desktop/PlotterController/plotter-express-server/output.gcode";
 
     unsigned int timer = millis();
 

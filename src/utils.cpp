@@ -122,6 +122,7 @@ void manualMode(string response, double *currentX, double *currentY, short *isSt
 
         sendCoordinates(*currentX, *currentY);
         updateMovingAxisStatus('x', "no");
+        setDriverStatus('x', DRIVER_DISABLE);
     }
 
     if (isMovingY == "yes")
@@ -136,6 +137,7 @@ void manualMode(string response, double *currentX, double *currentY, short *isSt
 
         sendCoordinates(*currentX, *currentY);
         updateMovingAxisStatus('y', "no");
+        setDriverStatus('y', DRIVER_DISABLE);
     }
 }
 
