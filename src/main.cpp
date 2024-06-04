@@ -12,7 +12,7 @@
 #include <sstream>
 using namespace std;
 
-const int SELECTED_MODE = QUARTER_STEP;
+const int SELECTED_MODE = SIXTEENTH_STEP;
 const int FETCH_INTERVAL = 300; // ms
 
 int main()

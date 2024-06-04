@@ -119,7 +119,7 @@ void autoHome(double *currentX, double *currentY)
             pulseStepMotor('x');
         }
 
-        if (readY == LOW)
+        if (readX == HIGH && readY == LOW)
         {
             pulseStepMotor('y');
         }
